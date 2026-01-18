@@ -1,33 +1,31 @@
 import requests
 import json
 
-COHERE_API_KEY = "bf5Qur8XrFgfmiAoU0KL111qbVud0P2KGQFZvdW8"
+def get_cohere_response(user_input, chat_history=[]):
+    url = "https://api.cohere.com/v2/chat"
+    api_key = "YOUR_COHERE_API_KEY"
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "accept": "application/json"
+    }
 
-def extract_data(text):
-    prompt = f"""
-Extract transaction info as JSON.
-Text: {text}
+    # Structured System Message to force Content Creation mode
+    system_message = {
+        "role": "system",
+        "content": "You are an expert AI Content Strategist. Your goal is to generate high-converting blog posts, social media captions, and scripts. Format all output in clean Markdown."
+    }
 
-Return format:
-{{
-  "item": "",
-  "customer": "",
-  "total": 0,
-  "paid": 0,
-  "debt": 0
-}}
-"""
+    payload = {
+        "model": "command-r-plus-08-2024", # Use the latest Command R+ model
+        "messages": [system_message] + chat_history + [{"role": "user", "content": user_input}],
+        "stream": False
+    }
 
-    res = requests.post(
-        "https://api.cohere.com/v1/chat",
-        headers={
-            "Authorization": f"Bearer {COHERE_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": "command-a-03-2025",
-            "message": prompt
-        }
-    )
-
-    return json.loads(res.json()["text"])
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    
+    if response.status_code == 200:
+        return response.json()['message']['content'][0]['text']
+    else:
+        return f"Error: {response.status_code} - {response.text}"
