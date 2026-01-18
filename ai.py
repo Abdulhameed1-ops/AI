@@ -18,7 +18,7 @@ def get_cohere_response(user_input, chat_history=[]):
     }
 
     payload = {
-        "model": "command-r-plus-08-2024", # Use the latest Command R+ model
+        "model": "command-a-03-2025", # Use the latest Command R+ model
         "messages": [system_message] + chat_history + [{"role": "user", "content": user_input}],
         "stream": False
     }
@@ -29,3 +29,4 @@ def get_cohere_response(user_input, chat_history=[]):
         return response.json()['message']['content'][0]['text']
     else:
         return f"Error: {response.status_code} - {response.text}"
+
